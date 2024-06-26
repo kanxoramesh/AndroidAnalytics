@@ -1,9 +1,10 @@
-package com.analytics.analytics_android
+package com.analytics.analytics_android.core
 
+import com.analytics.analytics_android.AnalyticsEvent
 import java.util.UUID
 import java.time.Instant
 
-class AnalyticsSession {
+class AnalyticsSession{
     val sessionId: String = UUID.randomUUID().toString()
     val startTime: Instant = Instant.now()
     var endTime: Instant? = null
