@@ -17,6 +17,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        AndroidAnalytics.getInstance().startSession()
+        AndroidAnalytics.getInstance().addEvent("screen_open", mapOf("screen" to "main"))
+
+
         setContent {
             MyApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -27,6 +31,8 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        AndroidAnalytics.getInstance().endSession()
+
     }
 }
 
