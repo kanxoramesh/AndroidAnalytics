@@ -13,8 +13,8 @@ object Mapping {
     fun sessionToEntity(session: Session): AnalyticsSessionEntity {
         return AnalyticsSessionEntity(
             sessionId = session.sessionId ?: UUID.randomUUID().toString(),
-            startTime = session.startTime?.toEpochMilli() ?: Instant.now().toEpochMilli(),
-            endTime = session.endTime?.toEpochMilli()
+            startTime = session.startTime ?: Instant.now().toEpochMilli(),
+            endTime = session.endTime
         )
     }
 
