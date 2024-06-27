@@ -3,7 +3,7 @@ package com.analytics.analytics_android.utils
 import android.content.Context
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import com.analytics.analytics_android.Logger
-import com.analytics.analytics_android.core.AnalyticsLogger
+import com.analytics.analytics_android.core.logger.AnalyticsLogger
 
 val logger: Logger = AnalyticsLogger.with(LogLevel.DEBUG)
 const val PERMISSION_CHECK_REPEAT_MAX_COUNT = 2

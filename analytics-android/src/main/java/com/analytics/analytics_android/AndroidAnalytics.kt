@@ -1,16 +1,17 @@
 import android.content.Context
-import android.util.Log
 import com.analytics.analytics_android.AnalyticsEvent
 import com.analytics.analytics_android.Logger
+import com.analytics.analytics_android.Session
 import com.analytics.analytics_android.Storage
-import com.analytics.analytics_android.core.AnalyticsLogger
-import com.analytics.analytics_android.core.AnalyticsSession
+import com.analytics.analytics_android.core.logger.AnalyticsLogger
+import com.analytics.analytics_android.core.session.AnalyticsSession
+import com.analytics.analytics_android.core.session.SessionController
 import com.analytics.analytics_android.utils.LogLevel
 
 class AndroidAnalytics private constructor(
     private val builder: Builder
 ) {
-    private var currentSession: AnalyticsSession? = null
+    private var controller: SessionController? = null
     private var logger: Logger? = AnalyticsLogger.with(LogLevel.INFO)
 
     init {
@@ -33,33 +34,25 @@ class AndroidAnalytics private constructor(
     }
 
     fun startSession() {
-        if (currentSession == null) {
-            currentSession = AnalyticsSession()
-            logger?.info("Session started: ${currentSession?.sessionId}")
+        val storage = builder.getStorage() ?: throw IllegalStateException("Storage must be set before starting a session")
+        if (controller == null) {
+            controller = SessionController(logger, storage)
+        } else {
+            controller?.startSession()
         }
     }
 
     fun addEvent(eventName: String, properties: Map<String, Any>) {
-        currentSession?.let {
-            it.addEvent(AnalyticsEvent(eventName, properties))
-            logger?.info("Event added: $eventName with properties: $properties")
-        } ?: {
-            startSession()
-            currentSession?.addEvent(AnalyticsEvent(eventName, properties))
-        }
+        val controller = controller ?: throw IllegalStateException("Please initiate session first")
+        controller.addEvent(eventName, properties)
     }
 
     fun endSession() {
-        currentSession?.let {
-            it.endSession()
-            builder.getStorage()?.saveSession(it)
-            logger?.info("Session ended: ${it.sessionId}")
-            currentSession = null
-        }
+        controller?.endSession();
     }
 
-    fun getSessionsData() {
-        builder.getStorage()?.getSessions()
+    fun getSessionsData():List<Session>?{
+        return controller?.getSessions()
     }
 
 
