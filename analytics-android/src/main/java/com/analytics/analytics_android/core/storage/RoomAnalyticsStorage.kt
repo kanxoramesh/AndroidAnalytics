@@ -39,7 +39,9 @@ class RoomAnalyticsStorage(context: Context) : Storage {
     override fun getSessionWithEvents(sessionId: String): SessionWithEvents? {
         return sessionDao.getSessionWithEvents(sessionId)
     }
-   override fun getAllSessionsWithEvents(): List<SessionWithEvents> {
+    override fun getAllSessionsWithEvents(): List<SessionWithEvents> {
         return sessionDao.getAllSessionsWithEvents()
     }
+
+
 }
