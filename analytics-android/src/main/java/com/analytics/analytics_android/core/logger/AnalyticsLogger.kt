@@ -1,4 +1,4 @@
-package com.analytics.analytics_android.core
+package com.analytics.analytics_android.core.logger
 
 
 import android.util.Log
