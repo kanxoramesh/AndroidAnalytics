@@ -11,6 +11,11 @@ import com.analytics.analytics_android.utils.jsonStringToMap
 import com.google.gson.Gson
 import java.time.Instant
 
+/**
+ * Implementation of SessionController interface for managing analytics sessions and events.
+ * @param logger Logger instance for logging session and event actions.
+ * @param storage Storage instance for saving and retrieving session and event data.
+ */
 class SessionControllerImpl(private val logger: Logger?, private val storage: Storage) :
     SessionController {
     private val gson = Gson()
@@ -22,6 +27,10 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
             currentSessionInternal = value
         }
 
+    /**
+     * Starts a new session if one does not already exist.
+     * If a session is started, it is saved to storage and logged.
+     */
     private fun startSessionIfNeeded() {
         if (currentSession == null) {
             currentSession = AnalyticsSession()
@@ -47,6 +56,9 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
         TODO("Not yet implemented")
     }
 
+    /**
+     * Ends the current session by updating its end time in storage and logging the action.
+     */
     override fun endSession() {
         currentSession?.let {
             storage.updateSession(currentSession?.sessionId!!, Instant.now().toEpochMilli())
@@ -57,6 +69,11 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
         currentSession = null;
     }
 
+
+    /**
+     * Retrieves all sessions from storage along with their associated events.
+     * @return List of Session objects, each containing a list of associated AnalyticsEvent objects.
+     */
     override fun getSessions(): List<Session> {
         return storage.getAllSessionsWithEvents().map { sessionWithEvents ->
             val session = sessionWithEvents.session
@@ -76,6 +93,13 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
         }
     }
 
+    /**
+     * Adds an event to the current session.
+     * If no session is active, throws IllegalStateException.
+     * @param eventName The name or identifier of the event.
+     * @param properties Additional properties associated with the event.
+     * @throws IllegalStateException if no session is active when adding the event.
+     */
     override fun addEvent(eventName: String, properties: Map<String, Any>) {
         currentSession?.let {
             storage.saveEvent(
