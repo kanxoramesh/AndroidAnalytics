@@ -25,7 +25,7 @@ data class AnalyticsEventEntity(
 
 @Entity(tableName = "sessions")
 data class AnalyticsSessionEntity(
-    @PrimaryKey val sessionId: String,
+    @PrimaryKey val session_id: String,
     val startTime: Long = Instant.now().toEpochMilli(),
     val endTime: Long? = null
 )
@@ -33,7 +33,7 @@ data class AnalyticsSessionEntity(
 data class SessionWithEvents(
     @Embedded val session: AnalyticsSessionEntity,
     @Relation(
-        parentColumn = "sessionId",
+        parentColumn = "session_id",
         entityColumn = "session_id"
     )
     val events: List<AnalyticsEventEntity>

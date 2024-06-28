@@ -1,17 +1,15 @@
 import android.content.Context
-import com.analytics.analytics_android.AnalyticsEvent
 import com.analytics.analytics_android.Logger
 import com.analytics.analytics_android.Session
 import com.analytics.analytics_android.Storage
 import com.analytics.analytics_android.core.logger.AnalyticsLogger
-import com.analytics.analytics_android.core.session.AnalyticsSession
-import com.analytics.analytics_android.core.session.SessionController
+import com.analytics.analytics_android.core.session.SessionControllerImpl
 import com.analytics.analytics_android.utils.LogLevel
 
 class AndroidAnalytics private constructor(
     private val builder: Builder
 ) {
-    private var controller: SessionController? = null
+    private var controller: SessionControllerImpl? = null
     private var logger: Logger? = AnalyticsLogger.with(LogLevel.INFO)
 
     init {
@@ -36,7 +34,7 @@ class AndroidAnalytics private constructor(
     fun startSession() {
         val storage = builder.getStorage() ?: throw IllegalStateException("Storage must be set before starting a session")
         if (controller == null) {
-            controller = SessionController(logger, storage)
+            controller = SessionControllerImpl(logger, storage)
         } else {
             controller?.startSession()
         }
