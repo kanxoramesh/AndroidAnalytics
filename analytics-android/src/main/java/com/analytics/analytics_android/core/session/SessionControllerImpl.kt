@@ -22,10 +22,6 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
             currentSessionInternal = value
         }
 
-    init {
-        startSessionIfNeeded()
-    }
-
     private fun startSessionIfNeeded() {
         if (currentSession == null) {
             currentSession = AnalyticsSession()
@@ -91,6 +87,8 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
             )
             logger?.info("Event added: $eventName with properties: $properties")
 
+        }?: kotlin.run {
+            throw IllegalStateException("Please initiate session first")
         }
 
     }
