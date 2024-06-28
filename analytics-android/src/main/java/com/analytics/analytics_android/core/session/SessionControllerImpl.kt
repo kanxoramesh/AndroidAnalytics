@@ -7,6 +7,7 @@ import com.analytics.analytics_android.SessionController
 import com.analytics.analytics_android.Storage
 import com.analytics.analytics_android.core.storage.AnalyticsEventEntity
 import com.analytics.analytics_android.core.storage.AnalyticsSessionEntity
+import com.analytics.analytics_android.utils.jsonStringToMap
 import com.google.gson.Gson
 import java.time.Instant
 
@@ -32,7 +33,7 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
                 storage.saveSession(AnalyticsSessionEntity(it.sessionId!!, it.startTime!!))
                 logger?.info("Session started: ${it.sessionId}")
             }
-        }else{
+        } else {
             logger?.info("Session already created: ${currentSession?.sessionId}")
         }
 
@@ -65,8 +66,12 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
             val session = sessionWithEvents.session
             val events = sessionWithEvents.events.map { eventEntity ->
 
-                var data=eventEntity.toJson()
-                gson.fromJson(data, AnalyticsEvent::class.java)
+                var data = AnalyticsEvent(
+                    eventName = eventEntity.eventName,
+                    properties = jsonStringToMap(eventEntity.properties),
+                    timestamp = eventEntity.timestamp
+                )
+                data
             }
             var resSession =
                 AnalyticsSession(session.session_id, session.startTime, session.endTime)

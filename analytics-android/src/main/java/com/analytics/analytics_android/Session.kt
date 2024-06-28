@@ -14,7 +14,6 @@ interface Session {
      * A unique identifier which is used to identify the session.
      */
     val sessionId: String?
-
     val startTime: Long?
     val endTime: Long?
     val events: List<AnalyticsEvent>
