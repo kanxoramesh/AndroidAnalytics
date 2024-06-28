@@ -1,11 +1,10 @@
 import android.content.Context
-import com.analytics.analytics_android.AnalyticsEvent
 import com.analytics.analytics_android.Logger
 import com.analytics.analytics_android.Session
+import com.analytics.analytics_android.SessionController
 import com.analytics.analytics_android.Storage
 import com.analytics.analytics_android.core.logger.AnalyticsLogger
-import com.analytics.analytics_android.core.session.AnalyticsSession
-import com.analytics.analytics_android.core.session.SessionController
+import com.analytics.analytics_android.core.session.SessionControllerImpl
 import com.analytics.analytics_android.utils.LogLevel
 
 class AndroidAnalytics private constructor(
@@ -13,9 +12,11 @@ class AndroidAnalytics private constructor(
 ) {
     private var controller: SessionController? = null
     private var logger: Logger? = AnalyticsLogger.with(LogLevel.INFO)
+    val storage = builder.getStorage() ?: throw IllegalStateException("Storage must be set before starting a session")
 
     init {
         logger = AnalyticsLogger.with(builder.getLogLevel());
+        controller ?: SessionControllerImpl(logger, storage).also { controller = it }
     }
 
     companion object {
@@ -34,17 +35,12 @@ class AndroidAnalytics private constructor(
     }
 
     fun startSession() {
-        val storage = builder.getStorage() ?: throw IllegalStateException("Storage must be set before starting a session")
-        if (controller == null) {
-            controller = SessionController(logger, storage)
-        } else {
-            controller?.startSession()
-        }
+        controller?.startSession()
     }
 
+
     fun addEvent(eventName: String, properties: Map<String, Any>) {
-        val controller = controller ?: throw IllegalStateException("Please initiate session first")
-        controller.addEvent(eventName, properties)
+        controller?.addEvent(eventName, properties)
     }
 
     fun endSession() {

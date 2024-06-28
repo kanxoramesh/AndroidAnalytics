@@ -12,7 +12,7 @@ object Mapping {
 
     fun sessionToEntity(session: Session): AnalyticsSessionEntity {
         return AnalyticsSessionEntity(
-            sessionId = session.sessionId ?: UUID.randomUUID().toString(),
+            session_id = session.sessionId ?: UUID.randomUUID().toString(),
             startTime = session.startTime ?: Instant.now().toEpochMilli(),
             endTime = session.endTime
         )

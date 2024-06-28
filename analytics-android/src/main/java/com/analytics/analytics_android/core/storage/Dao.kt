@@ -16,17 +16,17 @@ interface AnalyticsSessionDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertSession(session: AnalyticsSessionEntity)
 
-    @Query("SELECT * FROM sessions WHERE sessionId = :sessionId")
+    @Query("SELECT * FROM sessions WHERE session_id = :sessionId")
     fun getSession(sessionId: String): AnalyticsSessionEntity?
 
     @Query("SELECT * FROM sessions")
     fun getSessions(): List<AnalyticsSessionEntity>
 
-    @Query("UPDATE sessions SET endTime = :endTime WHERE sessionId = :sessionId")
+    @Query("UPDATE sessions SET endTime = :endTime WHERE session_id = :sessionId")
     fun updateSessionEndTime(sessionId: String, endTime: Long)
 
     @Transaction
-    @Query("SELECT * FROM sessions WHERE sessionId = :sessionId")
+    @Query("SELECT * FROM sessions WHERE session_id = :sessionId")
     fun getSessionWithEvents(sessionId: String): SessionWithEvents?
 
     @Transaction

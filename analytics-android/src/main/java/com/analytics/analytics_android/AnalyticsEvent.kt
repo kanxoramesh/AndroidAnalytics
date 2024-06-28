@@ -4,9 +4,10 @@ import java.time.Instant
 
 class AnalyticsEvent(
     private val eventName: String,
-    private val properties: Map<String, Any>
+    private val properties: Map<String, Any>,
+   private val timestamp: Long = Instant.now().toEpochMilli()
+
 ) {
-    private val timestamp: Instant = Instant.now()
 
     fun getEventData(): Map<String, Any> {
         return mapOf(

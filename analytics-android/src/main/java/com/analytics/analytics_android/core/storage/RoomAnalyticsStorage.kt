@@ -1,7 +1,7 @@
 package com.analytics.analytics_android.core.storage
+
 import android.content.Context
 import androidx.room.Room
-import com.analytics.analytics_android.Session
 import com.analytics.analytics_android.Storage
 
 class RoomAnalyticsStorage(context: Context) : Storage {
@@ -9,7 +9,9 @@ class RoomAnalyticsStorage(context: Context) : Storage {
     private val db: AnalyticsDatabase = Room.databaseBuilder(
         context.applicationContext,
         AnalyticsDatabase::class.java, "analytics-database"
-    ).build()
+    ).fallbackToDestructiveMigration()
+        .allowMainThreadQueries()
+        .build()
 
     private val eventDao = db.analyticsEventDao()
     private val sessionDao = db.analyticsSessionDao()
@@ -19,8 +21,8 @@ class RoomAnalyticsStorage(context: Context) : Storage {
         sessionDao.insertSession(session)
     }
 
-    override fun updateSession(sessionId:String,endTime: Long) {
-        sessionDao.updateSessionEndTime(sessionId,endTime)
+    override fun updateSession(sessionId: String, endTime: Long) {
+        sessionDao.updateSessionEndTime(sessionId, endTime)
     }
 
 
@@ -39,8 +41,10 @@ class RoomAnalyticsStorage(context: Context) : Storage {
     override fun getSessionWithEvents(sessionId: String): SessionWithEvents? {
         return sessionDao.getSessionWithEvents(sessionId)
     }
+
     override fun getAllSessionsWithEvents(): List<SessionWithEvents> {
-        return sessionDao.getAllSessionsWithEvents()
+        var data: List<SessionWithEvents> = sessionDao.getAllSessionsWithEvents()
+        return data
     }
 
 
