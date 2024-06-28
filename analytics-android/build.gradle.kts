@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    kotlin("kapt")
+
 }
 
 android {
@@ -39,8 +41,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.gson)
     implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    kapt("androidx.room:room-compiler:2.6.1")
+
+
 }
