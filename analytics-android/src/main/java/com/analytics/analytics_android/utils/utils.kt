@@ -37,9 +37,6 @@ enum class LogLevel {
     }
 }
 
-fun hasPermission(context: Context, permission: String): Boolean {
-    return hasPermission(context, permission, 0)
-}
 private fun hasPermission(context: Context, permission: String, repeatCount: Int): Boolean {
     try {
         return context.checkCallingOrSelfPermission(permission) == PERMISSION_GRANTED
