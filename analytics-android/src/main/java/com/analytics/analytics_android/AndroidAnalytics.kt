@@ -8,6 +8,7 @@ import com.analytics.analytics_android.core.session.SessionControllerImpl
 import com.analytics.analytics_android.network.HttpConnection
 import com.analytics.analytics_android.network.HttpMethod
 import com.analytics.analytics_android.NetworkSynchronizer
+import com.analytics.analytics_android.R
 import com.analytics.analytics_android.network.Executor
 import com.analytics.analytics_android.network.Request
 import com.analytics.analytics_android.utils.LogLevel
@@ -134,6 +135,7 @@ class AndroidAnalytics private constructor(
             if (!hasPermission(context, Manifest.permission.INTERNET))
             {
                 AnalyticsLogger.error(Exception(),"Android manifest permission issue: %s","INTERNET")
+                throw Exception(context.getString(R.string.permission_error))
             }
 
             this.networkSynchronizer = networkSynchronizer

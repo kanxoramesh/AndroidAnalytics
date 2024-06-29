@@ -134,6 +134,8 @@ class SessionControllerImpl(private val storage: Storage) :
             AnalyticsLogger.info("Event added: $eventName with properties: $properties")
 
         } ?: kotlin.run {
+            AnalyticsLogger.info("Session not created")
+
             throw IllegalStateException("Please initiate session first")
         }
 

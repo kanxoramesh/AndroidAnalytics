@@ -1,0 +1,3 @@
+<resources>
+    <string name="permission_error">Manifest  permission for INTERNET not found</string>
+</resources>
