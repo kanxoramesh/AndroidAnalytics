@@ -66,7 +66,9 @@ class AndroidAnalyticsTest {
 
         // Start a session and verify the startSession method is called on the controller
         analytics.startSession()
-        verify(mockController).startSession()
+        verify(mockController).startSession(builder.getMaxSessionPoolCount()?:10) { isReady,list ->
+
+        }
     }
 
     @Test
@@ -127,7 +129,7 @@ class AndroidAnalyticsTest {
         // Mock the SessionController and its return value
         val mockController = mock(SessionController::class.java)
         val sessions = listOf<Session>(mock(Session::class.java))
-        `when`(mockController.getSessions()).thenReturn(sessions)
+        `when`(mockController.getSessions(null)).thenReturn(sessions)
 
         // Inject the mock controller into the analytics instance
         val controllerField = AndroidAnalytics::class.java.getDeclaredField("controller")
@@ -136,7 +138,7 @@ class AndroidAnalyticsTest {
 
         // Get sessions data and verify the method is called on the controller
         val result = analytics.getSessionsData()
-        verify(mockController).getSessions()
+        verify(mockController).getSessions(null)
         assertThat(result).isEqualTo(sessions)
     }
 }

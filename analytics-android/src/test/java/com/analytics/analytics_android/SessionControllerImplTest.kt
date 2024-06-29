@@ -1,6 +1,5 @@
 package com.analytics.analytics_android
 
-import com.analytics.analytics_android.*
 import com.analytics.analytics_android.core.session.SessionControllerImpl
 import com.analytics.analytics_android.core.storage.AnalyticsEventEntity
 import com.analytics.analytics_android.core.storage.AnalyticsSessionEntity
@@ -9,7 +8,6 @@ import com.google.gson.Gson
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
@@ -37,7 +35,9 @@ class SessionControllerImplTest {
     fun testStartAndEndSession() {
 
         // Start session
-        sessionController.startSession()
+        sessionController.startSession(10) { isReady,data:List<Session>? ->
+
+        }
 
         // Verify session started and saved to storage
         assertNotNull(sessionController.currentSession)
@@ -74,7 +74,9 @@ class SessionControllerImplTest {
         mockStorage.saveEvent(eventEntity)
 
         // Start session
-        sessionController.startSession()
+        sessionController.startSession(10) { isReady ,data:List<Session>?->
+
+        }
 
         // Add event
         sessionController.addEvent(eventName, properties)
@@ -98,10 +100,10 @@ class SessionControllerImplTest {
         )
         val sessionWithEvents = SessionWithEvents(sessionEntity, listOf(eventEntity))
 
-        `when`(mockStorage.getAllSessionsWithEvents()).thenReturn(listOf(sessionWithEvents))
+        `when`(mockStorage.getSessionsWithEvents(null)).thenReturn(listOf(sessionWithEvents))
 
         // Retrieve sessions
-        val sessions = sessionController.getSessions()
+        val sessions = sessionController.getSessions(null)
         assertEquals(1, sessions.size)
 
         // Verify session data

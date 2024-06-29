@@ -38,18 +38,29 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
                 storage.saveSession(AnalyticsSessionEntity(it.sessionId!!, it.startTime!!))
                 logger?.info("Session started: ${it.sessionId}")
             }
+
         } else {
             logger?.info("Session already created: ${currentSession?.sessionId}")
         }
 
     }
 
-    override fun startSession() {
+    override fun startSession(poolCount: Int, param: (Boolean, List<Session>?) -> Unit) {
         startSessionIfNeeded()
+        var isReady = storage.getSessionPoolCount(poolCount) ?: false
+        var list: List<Session>? = null
+        if (isReady) {
+            list = getSessions(null)
+        }
+        param(isReady, list)
     }
 
     override fun pause() {
         TODO("Not yet implemented")
+    }
+
+    override fun removedSyncedData(ids:List<String>) {
+        storage?.removeAllSyncedData(ids)
     }
 
     override fun resume() {
@@ -74,8 +85,8 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
      * Retrieves all sessions from storage along with their associated events.
      * @return List of Session objects, each containing a list of associated AnalyticsEvent objects.
      */
-    override fun getSessions(): List<Session> {
-        return storage.getAllSessionsWithEvents().map { sessionWithEvents ->
+    override fun getSessions(limit: Int?): List<Session> {
+        return storage.getSessionsWithEvents(limit).map { sessionWithEvents ->
             val session = sessionWithEvents.session
             val events = sessionWithEvents.events.map { eventEntity ->
 
@@ -111,7 +122,7 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
             )
             logger?.info("Event added: $eventName with properties: $properties")
 
-        }?: kotlin.run {
+        } ?: kotlin.run {
             throw IllegalStateException("Please initiate session first")
         }
 

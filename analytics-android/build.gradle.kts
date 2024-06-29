@@ -52,5 +52,6 @@ dependencies {
     testImplementation (libs.kotlin.test.junit)
     testImplementation ("org.mockito:mockito-core:3.11.2")
     testImplementation ("org.mockito:mockito-inline:3.11.2")// Optional: For inline mocking
+    implementation ("com.squareup.okhttp3:okhttp:4.10.0")
 
 }

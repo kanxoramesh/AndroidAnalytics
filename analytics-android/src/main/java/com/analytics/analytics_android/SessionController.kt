@@ -28,7 +28,8 @@ interface SessionController  {
     /**
      * Expire the current session even if the timeout is not triggered.
      */
-    fun startSession()
+    fun startSession(poolCount: Int, param: (Boolean, List<Session>?) -> Unit)
     fun addEvent(eventName: String, properties: Map<String, Any>)
-    fun getSessions(): List<Session>
+    fun getSessions(limit: Int?): List<Session>
+    fun removedSyncedData(ids:List<String>)
 }
