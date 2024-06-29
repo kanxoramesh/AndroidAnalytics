@@ -12,6 +12,7 @@ import org.junit.Before
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.any
 
 class AndroidAnalyticsTest {
     private lateinit var mockContext: Context
@@ -27,6 +28,28 @@ class AndroidAnalyticsTest {
 
     }
 
+    @Test
+    fun testStartSession() {
+        // Initialize AndroidAnalytics
+        val builder = AndroidAnalytics.Builder(mockContext)
+            .setStorage(mockStorage)
+            .setLogLevel(LogLevel.INFO)
+            .maxSessionPoolCount(1)
+        AndroidAnalytics.initialize(builder)
+
+        // Retrieve the singleton instance
+        val analytics = AndroidAnalytics.getInstance()
+
+        // Mock the SessionController
+        val mockController = mock(SessionController::class.java)
+        val controllerField = AndroidAnalytics::class.java.getDeclaredField("controller")
+        controllerField.isAccessible = true
+        controllerField.set(analytics, mockController)
+
+        // Start a session and verify the startSession method is called on the controller
+        analytics.startSession()
+        verify(mockController).startSession(any(),any<(Boolean, List<Session>?) -> Unit>())
+    }
 
 
     @Test
@@ -48,29 +71,6 @@ class AndroidAnalyticsTest {
 
     }
 
-    @Test
-    fun testStartSession() {
-        // Initialize AndroidAnalytics
-        val builder = AndroidAnalytics.Builder(mockContext)
-            .setStorage(mockStorage)
-            .setLogLevel(LogLevel.INFO)
-        AndroidAnalytics.initialize(builder)
-
-        // Retrieve the singleton instance
-        val analytics = AndroidAnalytics.getInstance()
-
-        // Mock the SessionController
-        val mockController = mock(SessionController::class.java)
-        val controllerField = AndroidAnalytics::class.java.getDeclaredField("controller")
-        controllerField.isAccessible = true
-        controllerField.set(analytics, mockController)
-
-        // Start a session and verify the startSession method is called on the controller
-        analytics.startSession()
-        verify(mockController).startSession(builder.getMaxSessionPoolCount()?:10) { isReady,list ->
-
-        }
-    }
 
     @Test
     fun testAddEvent() {

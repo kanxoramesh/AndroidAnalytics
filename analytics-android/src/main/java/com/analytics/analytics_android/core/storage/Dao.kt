@@ -36,6 +36,7 @@ interface AnalyticsSessionDao {
     @Query("SELECT * FROM sessions ORDER BY startTime")
     fun getAllSessionsWithEvents(): List<SessionWithEvents>
 
+    @Transaction
     @Query("SELECT * FROM sessions ORDER BY startTime LIMIT :count ")
     fun getFirstLimitSession(count:Int): List<SessionWithEvents>
 

@@ -68,7 +68,7 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
         val okHttpRequest = buildPostRequest(request)
         var future = Executor.futureCallable(getRequestCallable(okHttpRequest))
         val tempCode = future[timeout.toLong(), TimeUnit.SECONDS] as? Int
-       return RequestResult(tempCode?:-1,request.payload.map { it.sessionId!! }?: emptyList())
+       return RequestResult(tempCode?:-1,request.payload.map { it.sessionId!! })
     }
 
 
