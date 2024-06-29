@@ -1,11 +1,10 @@
 package com.analytics.analytics_android.network
 
-import android.content.Context
 import android.net.TrafficStats
 import android.net.Uri
 import androidx.annotation.RestrictTo
-import com.analytics.analytics_android.Logger
-import com.analytics.analytics_android.Session
+import com.analytics.analytics_android.NetworkSynchronizer
+import com.analytics.analytics_android.core.logger.AnalyticsLogger
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
@@ -66,11 +65,9 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
     }
 
     override fun sendRequest(request: Request): RequestResult {
-
         val okHttpRequest = buildPostRequest(request)
         var future = Executor.futureCallable(getRequestCallable(okHttpRequest))
         val tempCode = future[timeout.toLong(), TimeUnit.SECONDS] as? Int
-
        return RequestResult(tempCode?:-1,request.payload.map { it.sessionId!! }?: emptyList())
     }
 
@@ -115,7 +112,7 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
      */
     private fun requestSender(request: okhttp3.Request): Int {
         try {
-            //Logger.v(TAG, "Sending request: %s", request)
+            AnalyticsLogger.info("Sending request: %s", request)
             TrafficStats.setThreadStatsTag(TRAFFIC_STATS_TAG)
             val resp = client?.newCall(request)?.execute()
             resp?.let {
@@ -125,7 +122,7 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
             return -1
         } catch (e: IOException) {
             println(e)
-            //Logger.e(TAG, "Request sending failed: %s", e.toString())
+            AnalyticsLogger.error(e, "Request sending failed: %s", e.toString())
             return -1
         }
     }

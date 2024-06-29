@@ -8,7 +8,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
-
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 object Executor {
     private var executor: ExecutorService? = null
@@ -35,27 +34,6 @@ object Executor {
         return executor!!
     }
 
-    /**
-     * Sends a runnable to the executor service.
-     *
-     * @param runnable the runnable to be queued
-     * @param exceptionHandler the handler of exception raised by the runnable
-     */
-    @JvmStatic
-    fun execute(runnable: Runnable?, exceptionHandler: ExceptionHandler?) {
-        val executor = getExecutor()
-        try {
-            executor.execute {
-                try {
-                    runnable?.run()
-                } catch (t: Throwable) {
-                    exceptionHandler?.handle(t)
-                }
-            }
-        } catch (e: Exception) {
-            exceptionHandler?.handle(e)
-        }
-    }
 
     /**
      * Sends a callable to the executor service and

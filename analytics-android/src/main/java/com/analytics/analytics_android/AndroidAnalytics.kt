@@ -1,5 +1,5 @@
+import android.Manifest
 import android.content.Context
-import com.analytics.analytics_android.Logger
 import com.analytics.analytics_android.Session
 import com.analytics.analytics_android.SessionController
 import com.analytics.analytics_android.Storage
@@ -7,9 +7,11 @@ import com.analytics.analytics_android.core.logger.AnalyticsLogger
 import com.analytics.analytics_android.core.session.SessionControllerImpl
 import com.analytics.analytics_android.network.HttpConnection
 import com.analytics.analytics_android.network.HttpMethod
-import com.analytics.analytics_android.network.NetworkSynchronizer
+import com.analytics.analytics_android.NetworkSynchronizer
+import com.analytics.analytics_android.network.Executor
 import com.analytics.analytics_android.network.Request
 import com.analytics.analytics_android.utils.LogLevel
+import com.analytics.analytics_android.utils.hasPermission
 import okhttp3.OkHttpClient
 
 /**
@@ -18,13 +20,13 @@ import okhttp3.OkHttpClient
 class AndroidAnalytics private constructor(
     private val builder: Builder
 ) {
+    private var defaultPoolCounter:Int=10
     private var controller: SessionController? = null
-    private var logger: Logger? = AnalyticsLogger.with(LogLevel.INFO)
     val storage = builder.getStorage() ?: throw IllegalStateException("Storage must be set before starting a session")
 
     init {
-        logger = AnalyticsLogger.with(builder.getLogLevel());
-        controller ?: SessionControllerImpl(logger, storage).also { controller = it }
+       builder.getLogLevel()?.let {  AnalyticsLogger.initialize(it)}
+        controller ?: SessionControllerImpl(storage).also { controller = it }
     }
 
     companion object {
@@ -54,11 +56,11 @@ class AndroidAnalytics private constructor(
      * Starts a new analytics session.
      */
     fun startSession() {
-        controller?.startSession(builder.getMaxSessionPoolCount()?:10){isReadyToSync,sessions:List<Session>?->
+        controller?.startSession(builder.getMaxSessionPoolCount()?:defaultPoolCounter){isReadyToSync,sessions:List<Session>?->
             if(isReadyToSync){
                 sessions?.let {
-
                     var result=builder.getNetworkSynchronizer()?.sendRequest(Request(sessions))
+                    Executor.shutdown()
                     if(result?.isSuccessful == true){
                         controller?.removedSyncedData(result.sessionIds)
                     }
@@ -119,7 +121,7 @@ class AndroidAnalytics private constructor(
          * @param logLevel LogLevel enum specifying the desired logging level.
          * @return Builder instance for method chaining.
          */
-        fun setLogLevel(logLevel: LogLevel) = apply { this.logLevel = logLevel }
+        fun setLogLevel(logLevel: LogLevel?) = apply { this.logLevel = logLevel }
         fun getLogLevel(): LogLevel? {
             return logLevel
         }
@@ -127,7 +129,15 @@ class AndroidAnalytics private constructor(
         /**
          * Sync cache data  to network
          */
-        fun setNetworkSynchronizer(networkSynchronizer: NetworkSynchronizer) = apply { this.networkSynchronizer = networkSynchronizer }
+        fun setNetworkSynchronizer(networkSynchronizer: NetworkSynchronizer) = apply {
+
+            if (!hasPermission(context, Manifest.permission.INTERNET))
+            {
+                AnalyticsLogger.error(Exception(),"Android manifest permission issue: %s","INTERNET")
+            }
+
+            this.networkSynchronizer = networkSynchronizer
+        }
         fun getNetworkSynchronizer(): NetworkSynchronizer? {
             return networkSynchronizer
         }

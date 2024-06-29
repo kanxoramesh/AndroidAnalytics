@@ -2,6 +2,7 @@ package com.analytics.analytics_android
 
 import AndroidAnalytics
 import android.content.Context
+import com.analytics.analytics_android.core.logger.AnalyticsLogger
 import com.analytics.analytics_android.utils.LogLevel
 import org.junit.Test
 
@@ -15,14 +16,14 @@ import org.mockito.Mockito.`when`
 class AndroidAnalyticsTest {
     private lateinit var mockContext: Context
     private lateinit var mockStorage: Storage
-    private lateinit var mockLogger: Logger
+    private lateinit var mockLogger: AnalyticsLogger
 
     @Before
     fun setUp() {
 
         mockContext = mock(Context::class.java)
         mockStorage = mock(Storage::class.java)
-        mockLogger = mock(Logger::class.java)
+        mockLogger = mock(AnalyticsLogger::class.java)
 
     }
 

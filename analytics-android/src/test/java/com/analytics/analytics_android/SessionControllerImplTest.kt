@@ -1,5 +1,6 @@
 package com.analytics.analytics_android
 
+import com.analytics.analytics_android.core.logger.AnalyticsLogger
 import com.analytics.analytics_android.core.session.SessionControllerImpl
 import com.analytics.analytics_android.core.storage.AnalyticsEventEntity
 import com.analytics.analytics_android.core.storage.AnalyticsSessionEntity
@@ -16,7 +17,7 @@ import java.time.Instant
 class SessionControllerImplTest {
 
     @Mock
-    private lateinit var mockLogger: Logger
+    private lateinit var mockLogger: AnalyticsLogger
 
     @Mock
     private lateinit var mockStorage: Storage
@@ -28,7 +29,7 @@ class SessionControllerImplTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        sessionController = SessionControllerImpl(mockLogger, mockStorage)
+        sessionController = SessionControllerImpl(mockStorage)
     }
 
     @Test

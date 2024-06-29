@@ -19,7 +19,7 @@ data class AnalyticsEventEntity(
 
 ) {
     fun toJson(): String {
-        return Gson().toJson(this) // Serialize eventEntity to JSON
+        return Gson().toJson(this)
     }
 }
 

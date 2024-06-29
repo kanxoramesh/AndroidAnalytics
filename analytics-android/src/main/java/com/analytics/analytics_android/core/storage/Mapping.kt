@@ -18,19 +18,6 @@ object Mapping {
         )
     }
 
-//    fun entityToSession(entity: AnalyticsSessionEntity, events: Collection<AnalyticsEventEntity>): Session {
-//        return AnalyticsSession(
-//            sessionId = entity.sessionId,
-//            startTime = Instant.ofEpochMilli(entity.startTime),
-//            endTime = entity.endTime?.let { Instant.ofEpochMilli(it) }
-//        ).apply {
-//            this.events.addAll(events)
-//        }
-//    }
-//
-//    fun entityToEvent(entity: AnalyticsEventEntity): AnalyticsEvent {
-//        return AnalyticsEvent(entity.eventName,entity.sessionId)
-//    }
 
 
     fun eventToJson(event: AnalyticsEventEntity): String {

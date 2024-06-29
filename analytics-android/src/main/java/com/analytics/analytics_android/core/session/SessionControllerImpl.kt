@@ -1,10 +1,10 @@
 package com.analytics.analytics_android.core.session
 
 import com.analytics.analytics_android.AnalyticsEvent
-import com.analytics.analytics_android.Logger
 import com.analytics.analytics_android.Session
 import com.analytics.analytics_android.SessionController
 import com.analytics.analytics_android.Storage
+import com.analytics.analytics_android.core.logger.AnalyticsLogger
 import com.analytics.analytics_android.core.storage.AnalyticsEventEntity
 import com.analytics.analytics_android.core.storage.AnalyticsSessionEntity
 import com.analytics.analytics_android.utils.jsonStringToMap
@@ -16,7 +16,7 @@ import java.time.Instant
  * @param logger Logger instance for logging session and event actions.
  * @param storage Storage instance for saving and retrieving session and event data.
  */
-class SessionControllerImpl(private val logger: Logger?, private val storage: Storage) :
+class SessionControllerImpl(private val storage: Storage) :
     SessionController {
     private val gson = Gson()
     private var currentSessionInternal: Session? = null
@@ -36,15 +36,21 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
             currentSession = AnalyticsSession()
             currentSession?.let {
                 storage.saveSession(AnalyticsSessionEntity(it.sessionId!!, it.startTime!!))
-                logger?.info("Session started: ${it.sessionId}")
+                AnalyticsLogger.info("Session started: ${it.sessionId}")
             }
 
         } else {
-            logger?.info("Session already created: ${currentSession?.sessionId}")
+            AnalyticsLogger.info("Session already created: ${currentSession?.sessionId}")
         }
 
     }
 
+    /**
+     * Starts a session with the specified pool count and returns the result via the callback.
+     *
+     * @param poolCount The desired pool count for sessions.
+     * @param param Callback function that receives a boolean indicating readiness and an optional list of sessions.
+     */
     override fun startSession(poolCount: Int, param: (Boolean, List<Session>?) -> Unit) {
         startSessionIfNeeded()
         val isReady = storage.getSessionPoolCount()>poolCount
@@ -59,8 +65,13 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
         TODO("Not yet implemented")
     }
 
+    /**
+     * Removes synchronized Session and Event data for the specified IDs from storage.
+     *
+     * @param ids List of IDs identifying data to be removed.
+     */
     override fun removedSyncedData(ids:List<String>) {
-        storage?.removeAllSyncedData(ids)
+        storage.removeAllSyncedData(ids)
     }
 
     override fun resume() {
@@ -75,7 +86,7 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
             storage.updateSession(currentSession?.sessionId!!, Instant.now().toEpochMilli())
 
         }
-        logger?.info("Session Ended:${currentSession?.sessionId}")
+        AnalyticsLogger.info("Session Ended:${currentSession?.sessionId}")
 
         currentSession = null;
     }
@@ -120,7 +131,7 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
                     properties = gson.toJson(properties)
                 )
             )
-            logger?.info("Event added: $eventName with properties: $properties")
+            AnalyticsLogger.info("Event added: $eventName with properties: $properties")
 
         } ?: kotlin.run {
             throw IllegalStateException("Please initiate session first")

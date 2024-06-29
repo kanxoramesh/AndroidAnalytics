@@ -2,36 +2,27 @@ package com.analytics.analytics_android.core.logger
 
 
 import android.util.Log
-import com.analytics.analytics_android.Logger
+import androidx.annotation.RestrictTo
 import com.analytics.analytics_android.utils.LogLevel
 
-/** An abstraction for logging messages.  */
-class AnalyticsLogger(private val tag: String, val logLevel: LogLevel) : Logger {
-    /** Log a verbose message.  */
-    override fun verbose(format: String?, vararg extra: Any?) {
-        if (shouldLog(LogLevel.VERBOSE)) {
-            Log.v(tag, String.format(format!!, *extra))
-        }
-    }
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+object AnalyticsLogger  {
 
-    /** Log an info message.  */
-    override fun info(format: String?, vararg extra: Any?) {
+     fun info(format: String?, vararg extra: Any?) {
         if (shouldLog(LogLevel.INFO)) {
-            Log.i(tag, String.format(format!!, *extra))
+            Log.i(DEFAULT_TAG, String.format(format!!, *extra))
         }
     }
 
-    /** Log a debug message.  */
-    override fun debug(format: String?, vararg extra: Any?) {
+     fun debug(format: String?, vararg extra: Any?) {
         if (shouldLog(LogLevel.DEBUG)) {
-            Log.d(tag, String.format(format!!, *extra))
+            Log.d(DEFAULT_TAG, String.format(format!!, *extra))
         }
     }
 
-    /** Log an error message.  */
-    override fun error(error: Throwable?, format: String?, vararg extra: Any?) {
+     fun error(error: Throwable?, format: String?, vararg extra: Any?) {
         if (shouldLog(LogLevel.INFO)) {
-            Log.e(tag, String.format(format!!, *extra), error)
+            Log.e(DEFAULT_TAG, String.format(format!!, *extra), error)
         }
     }
 
@@ -39,13 +30,13 @@ class AnalyticsLogger(private val tag: String, val logLevel: LogLevel) : Logger 
         return logLevel.ordinal >= level.ordinal
     }
 
-    companion object {
-        private const val DEFAULT_TAG = "Analytics"
+    private var logLevel: LogLevel=LogLevel.NONE
+    private const val DEFAULT_TAG = "Analytics"
 
-        /** Returns a new [Logger] with the give `level`.  */
-        fun with(level: LogLevel?): Logger {
-            return AnalyticsLogger(DEFAULT_TAG, level ?: LogLevel.INFO)
-
-        }
+    fun initialize(logLevel: LogLevel) {
+        this.logLevel = logLevel
     }
+
+
+
 }
