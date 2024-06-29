@@ -1,4 +1,7 @@
 package com.analytics.analytics_android.network
+enum class HttpMethod {
 
-class HttpMethod {
+    GET,
+
+    POST
 }

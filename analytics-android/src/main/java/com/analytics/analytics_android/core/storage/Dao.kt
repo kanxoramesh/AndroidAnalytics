@@ -19,8 +19,11 @@ interface AnalyticsSessionDao {
     @Query("SELECT * FROM sessions WHERE session_id = :sessionId")
     fun getSession(sessionId: String): AnalyticsSessionEntity?
 
-    @Query("SELECT * FROM sessions")
+    @Query("SELECT * FROM sessions ORDER BY startTime")
     fun getSessions(): List<AnalyticsSessionEntity>
+
+    @Query("SELECT COUNT(*) FROM sessions")
+    fun getSessionCount(): Int
 
     @Query("UPDATE sessions SET endTime = :endTime WHERE session_id = :sessionId")
     fun updateSessionEndTime(sessionId: String, endTime: Long)
@@ -30,7 +33,22 @@ interface AnalyticsSessionDao {
     fun getSessionWithEvents(sessionId: String): SessionWithEvents?
 
     @Transaction
-    @Query("SELECT * FROM sessions")
+    @Query("SELECT * FROM sessions ORDER BY startTime")
     fun getAllSessionsWithEvents(): List<SessionWithEvents>
+
+    @Query("SELECT * FROM sessions ORDER BY startTime LIMIT :count ")
+    fun getFirstLimitSession(count:Int): List<SessionWithEvents>
+
+    @Query("DELETE FROM sessions WHERE session_id IN (:ids)")
+    fun deleteSessionsByIds(ids: List<String>)
+
+    @Query("DELETE FROM events WHERE session_id IN (:sessionIds)")
+    fun deleteEventsBySessionIds(sessionIds: List<String>)
+
+    @Transaction
+    fun deleteSessionsWithEvents(sessionIds: List<String>) {
+        deleteEventsBySessionIds(sessionIds)
+        deleteSessionsByIds(sessionIds)
+    }
 }
 

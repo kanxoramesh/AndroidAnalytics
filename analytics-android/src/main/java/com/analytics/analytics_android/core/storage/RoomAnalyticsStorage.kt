@@ -26,8 +26,13 @@ class RoomAnalyticsStorage(context: Context) : Storage {
     }
 
 
-    override fun getSession(sessionId: String): AnalyticsSessionEntity? {
-        return sessionDao.getSession(sessionId)
+    override fun getSessionPoolCount(count: Int): Boolean? {
+        return sessionDao.getSessionCount() >= count
+
+    }
+
+    override fun removeAllSyncedData(ids: List<String>) {
+        return sessionDao.deleteSessionsWithEvents(ids);
     }
 
     override fun saveEvent(event: AnalyticsEventEntity) {
@@ -42,9 +47,12 @@ class RoomAnalyticsStorage(context: Context) : Storage {
         return sessionDao.getSessionWithEvents(sessionId)
     }
 
-    override fun getAllSessionsWithEvents(): List<SessionWithEvents> {
-        var data: List<SessionWithEvents> = sessionDao.getAllSessionsWithEvents()
-        return data
+    override fun getSessionsWithEvents(limit: Int?): List<SessionWithEvents> {
+        limit?.let {
+            return sessionDao.getFirstLimitSession(limit)
+        } ?: run {
+            return sessionDao.getAllSessionsWithEvents()
+        }
     }
 
 

@@ -6,6 +6,7 @@ import com.analytics.analytics_android.core.storage.AnalyticsEventEntity
 import com.analytics.analytics_android.core.storage.AnalyticsSessionEntity
 import com.analytics.analytics_android.core.storage.RoomAnalyticsStorage
 import com.analytics.analytics_android.core.storage.SessionWithEvents
+import com.analytics.analytics_android.network.NetworkSynchronizer
 import com.analytics.analytics_android.utils.LogLevel
 
 class MyApplication : Application() {
@@ -16,6 +17,6 @@ class MyApplication : Application() {
             AndroidAnalytics.Builder(this)
                 .setStorage(RoomAnalyticsStorage(this))
                 .setLogLevel(LogLevel.INFO)
-        )
+                .setNetworkSynchronizer(AndroidAnalytics.OkHttpNetworkConnectionBuilder("").build()))
     }
 }
