@@ -8,10 +8,11 @@ interface Storage {
 
     fun saveSession(session: AnalyticsSessionEntity);
     fun updateSession(sessionId: String, endTime: Long);
-    fun getSession(sessionId: String): AnalyticsSessionEntity?
+    fun getSessionPoolCount(count: Int): Boolean?
     fun saveEvent(event: AnalyticsEventEntity)
     fun getEvents(sessionId: String): List<AnalyticsEventEntity>
 
     fun getSessionWithEvents(sessionId: String): SessionWithEvents?
-    fun getAllSessionsWithEvents(): List<SessionWithEvents>
+    fun getSessionsWithEvents(limit: Int?): List<SessionWithEvents>
+    fun removeAllSyncedData(ids:List<String>)
 }

@@ -5,7 +5,12 @@ import com.analytics.analytics_android.SessionController
 import com.analytics.analytics_android.Storage
 import com.analytics.analytics_android.core.logger.AnalyticsLogger
 import com.analytics.analytics_android.core.session.SessionControllerImpl
+import com.analytics.analytics_android.network.HttpConnection
+import com.analytics.analytics_android.network.HttpMethod
+import com.analytics.analytics_android.network.NetworkSynchronizer
+import com.analytics.analytics_android.network.Request
 import com.analytics.analytics_android.utils.LogLevel
+import okhttp3.OkHttpClient
 
 /**
  * Main entry point for managing analytics sessions and events in an Android application.
@@ -49,7 +54,18 @@ class AndroidAnalytics private constructor(
      * Starts a new analytics session.
      */
     fun startSession() {
-        controller?.startSession()
+        controller?.startSession(builder.getMaxSessionPoolCount()?:10){isReady,sessions:List<Session>?->
+            if(isReady){
+                sessions?.let {
+
+                    var result=builder.getNetworkSynchronizer()?.sendRequest(Request(sessions))
+                    if(result?.isSuccessful == true){
+                        controller?.removedSyncedData(result.sessionIds)
+                    }
+                }
+            }
+
+        }
     }
 
 
@@ -74,7 +90,7 @@ class AndroidAnalytics private constructor(
      * @return List of Session objects representing analytics sessions.
      */
     fun getSessionsData():List<Session>?{
-        return controller?.getSessions()
+        return controller?.getSessions(null)
     }
 
 
@@ -85,7 +101,8 @@ class AndroidAnalytics private constructor(
     class Builder(private val context: Context) {
         private var storage: Storage? = null
         private var logLevel: LogLevel? = null
-
+        private var poolCount: Int? = 10
+        private var networkSynchronizer: NetworkSynchronizer?=null
 
         /**
          * Sets the storage implementation for storing analytics data.
@@ -107,6 +124,20 @@ class AndroidAnalytics private constructor(
             return logLevel
         }
 
+
+        fun setNetworkSynchronizer(networkSynchronizer: NetworkSynchronizer) = apply { this.networkSynchronizer = networkSynchronizer }
+        fun getNetworkSynchronizer(): NetworkSynchronizer? {
+            return networkSynchronizer
+        }
+
+        /**
+         * Max session stored in local cache, default is 10. Network sync will call after that
+         */
+        fun maxSessionPoolCount(count: Int) = apply { this.poolCount = count }
+        fun getMaxSessionPoolCount(): Int? {
+            return poolCount
+        }
+
         /**
          * Builds and returns an instance of AndroidAnalytics with the configured settings.
          * @return Configured instance of AndroidAnalytics.
@@ -119,4 +150,56 @@ class AndroidAnalytics private constructor(
             return AndroidAnalytics(this)
         }
     }
+
+
+    /**
+     * Builder for the OkHttpNetworkConnection.
+     * @param uri The uri of the collector
+     */
+    class OkHttpNetworkConnectionBuilder(
+        val uri: String) {
+        var httpMethod = HttpMethod.POST // Optional
+        var timeout = 30 // Optional
+        var client: OkHttpClient? = null // Optional
+        var requestHeaders: Map<String, String>? = null // Optional
+
+        /**
+         * GET or POST.
+         * @param httpMethod The method
+         * @return itself
+         */
+        fun method(httpMethod: HttpMethod): OkHttpNetworkConnectionBuilder {
+            this.httpMethod = httpMethod
+            return this
+        }
+
+        fun timeout(timeout: Int): OkHttpNetworkConnectionBuilder {
+            this.timeout = timeout
+            return this
+        }
+
+        fun client(client: OkHttpClient?): OkHttpNetworkConnectionBuilder {
+            this.client = client
+            return this
+        }
+
+        /**
+         * A map of custom HTTP headers to add to the request.
+         */
+        fun requestHeaders(requestHeaders: Map<String, String>?): OkHttpNetworkConnectionBuilder {
+            this.requestHeaders = requestHeaders
+            return this
+        }
+
+        /**
+         * Creates a new OkHttpConnection
+         *
+         * @return a new OkHttpConnection object
+         */
+        fun build(): NetworkSynchronizer {
+            return HttpConnection(this)
+        }
+    }
+
+
 }
