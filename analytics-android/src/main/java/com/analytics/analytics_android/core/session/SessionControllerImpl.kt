@@ -47,10 +47,10 @@ class SessionControllerImpl(private val logger: Logger?, private val storage: St
 
     override fun startSession(poolCount: Int, param: (Boolean, List<Session>?) -> Unit) {
         startSessionIfNeeded()
-        var isReady = storage.getSessionPoolCount(poolCount) ?: false
+        val isReady = storage.getSessionPoolCount()>poolCount
         var list: List<Session>? = null
         if (isReady) {
-            list = getSessions(null)
+            list = getSessions(poolCount)
         }
         param(isReady, list)
     }

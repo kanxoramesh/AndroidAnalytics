@@ -46,12 +46,12 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    kapt("androidx.room:room-compiler:2.6.1")
+    kapt(libs.androidx.room.compiler)
     testImplementation (libs.assertj.core)
     testImplementation (libs.kotlin.stdlib)
     testImplementation (libs.kotlin.test.junit)
-    testImplementation ("org.mockito:mockito-core:3.11.2")
-    testImplementation ("org.mockito:mockito-inline:3.11.2")// Optional: For inline mocking
-    implementation ("com.squareup.okhttp3:okhttp:4.10.0")
+    testImplementation (libs.mockito.core)
+    testImplementation (libs.mockito.inline)// Optional: For inline mocking
+    implementation (libs.okhttp)
 
 }

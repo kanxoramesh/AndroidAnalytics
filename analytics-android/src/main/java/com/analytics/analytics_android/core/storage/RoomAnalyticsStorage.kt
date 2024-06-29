@@ -26,8 +26,8 @@ class RoomAnalyticsStorage(context: Context) : Storage {
     }
 
 
-    override fun getSessionPoolCount(count: Int): Boolean? {
-        return sessionDao.getSessionCount() >= count
+    override fun getSessionPoolCount(): Int {
+        return sessionDao.getSessionCount()
 
     }
 

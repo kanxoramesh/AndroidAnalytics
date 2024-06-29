@@ -8,7 +8,7 @@ interface Storage {
 
     fun saveSession(session: AnalyticsSessionEntity);
     fun updateSession(sessionId: String, endTime: Long);
-    fun getSessionPoolCount(count: Int): Boolean?
+    fun getSessionPoolCount(): Int
     fun saveEvent(event: AnalyticsEventEntity)
     fun getEvents(sessionId: String): List<AnalyticsEventEntity>
 

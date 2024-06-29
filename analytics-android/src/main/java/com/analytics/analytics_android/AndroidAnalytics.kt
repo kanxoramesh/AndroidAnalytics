@@ -54,8 +54,8 @@ class AndroidAnalytics private constructor(
      * Starts a new analytics session.
      */
     fun startSession() {
-        controller?.startSession(builder.getMaxSessionPoolCount()?:10){isReady,sessions:List<Session>?->
-            if(isReady){
+        controller?.startSession(builder.getMaxSessionPoolCount()?:10){isReadyToSync,sessions:List<Session>?->
+            if(isReadyToSync){
                 sessions?.let {
 
                     var result=builder.getNetworkSynchronizer()?.sendRequest(Request(sessions))
@@ -124,7 +124,9 @@ class AndroidAnalytics private constructor(
             return logLevel
         }
 
-
+        /**
+         * Sync cache data  to network
+         */
         fun setNetworkSynchronizer(networkSynchronizer: NetworkSynchronizer) = apply { this.networkSynchronizer = networkSynchronizer }
         fun getNetworkSynchronizer(): NetworkSynchronizer? {
             return networkSynchronizer

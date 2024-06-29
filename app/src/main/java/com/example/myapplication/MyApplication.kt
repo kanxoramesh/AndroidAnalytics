@@ -18,9 +18,10 @@ class MyApplication : Application() {
             AndroidAnalytics.Builder(this)
                 .setStorage(RoomAnalyticsStorage(this))
                 .setLogLevel(LogLevel.INFO)
-                .setNetworkSynchronizer(AndroidAnalytics.OkHttpNetworkConnectionBuilder("")
+                .maxSessionPoolCount(2)
+                .setNetworkSynchronizer(AndroidAnalytics.OkHttpNetworkConnectionBuilder("http://10.0.2.2:8080/network")
                     .method(HttpMethod.POST)
-                    .timeout(2)
+                    .timeout(5)
                     //.client(OkHttpClient())//Optional
                     .build()))
     }

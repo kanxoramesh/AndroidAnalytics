@@ -42,6 +42,7 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
         } else {
             when (url.scheme) {
                 "https" -> {}
+                "http" -> {}
                 else -> tempUri = "https://" + builder.uri
             }
         }
@@ -123,6 +124,7 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
             }
             return -1
         } catch (e: IOException) {
+            println(e)
             //Logger.e(TAG, "Request sending failed: %s", e.toString())
             return -1
         }
