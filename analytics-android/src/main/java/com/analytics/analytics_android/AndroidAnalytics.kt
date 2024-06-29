@@ -173,6 +173,9 @@ class AndroidAnalytics private constructor(
             return this
         }
 
+        /**
+         * Time-out to wait for sync execution in SECOND
+         */
         fun timeout(timeout: Int): OkHttpNetworkConnectionBuilder {
             this.timeout = timeout
             return this
