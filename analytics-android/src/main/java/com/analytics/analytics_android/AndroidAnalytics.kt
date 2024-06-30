@@ -70,7 +70,7 @@ class AndroidAnalytics private constructor(
                     Executor.shutdown()
                     if(result?.isSuccessful == true){
                         controller?.removedSyncedData(result.sessionIds)
-                        coroutineScope?.cancel()
+                        //coroutineScope?.cancel()
                     }}
                 }
             }
