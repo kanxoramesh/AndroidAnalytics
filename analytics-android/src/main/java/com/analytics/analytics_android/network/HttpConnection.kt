@@ -8,8 +8,10 @@ import com.analytics.analytics_android.core.logger.AnalyticsLogger
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.net.SocketTimeoutException
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 /**
  * Components in charge to send events to the collector.
@@ -56,8 +58,8 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
         // Configure with external OkHttpClient
         client = if (builder.client == null) {
             OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
                 .build()
         } else {
             builder.client
@@ -67,8 +69,17 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
     override fun sendRequest(request: Request): RequestResult {
         val okHttpRequest = buildPostRequest(request)
         var future = Executor.futureCallable(getRequestCallable(okHttpRequest))
-        val tempCode = future[timeout.toLong(), TimeUnit.SECONDS] as? Int
-       return RequestResult(tempCode?:-1,request.payload.map { it.sessionId!! }?: emptyList())
+
+        try {
+            val tempCode = future[timeout.toLong(), TimeUnit.SECONDS] as? Int
+            return RequestResult(tempCode?:-1,request.payload.map { it.sessionId!! })
+        } catch (e: Exception) {
+            // Handle timeout
+            AnalyticsLogger.info("Request timed out!")
+            return RequestResult(-1, emptyList()) // Or handle as appropriate
+        } finally {
+            future.cancel(true) // Cancel the future to stop the task
+        }
     }
 
 
@@ -120,9 +131,13 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
                 return resp.code
             }
             return -1
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             println(e)
             AnalyticsLogger.error(e, "Request sending failed: %s", e.toString())
+            return -1
+        }catch (e: SocketTimeoutException){
+            println(e)
+            AnalyticsLogger.error(e, "Socket Time Out: %s", e.toString())
             return -1
         }
     }

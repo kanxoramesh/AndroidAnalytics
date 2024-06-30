@@ -13,6 +13,10 @@ import com.analytics.analytics_android.network.Executor
 import com.analytics.analytics_android.network.Request
 import com.analytics.analytics_android.utils.LogLevel
 import com.analytics.analytics_android.utils.hasPermission
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
 /**
@@ -21,6 +25,7 @@ import okhttp3.OkHttpClient
 class AndroidAnalytics private constructor(
     private val builder: Builder
 ) {
+    private val coroutineScope = CoroutineScope(Dispatchers.Default) // Example of creating a new coroutine scope
     private var defaultPoolCounter:Int=10
     private var controller: SessionController? = null
     val storage = builder.getStorage() ?: throw IllegalStateException("Storage must be set before starting a session")
@@ -60,11 +65,13 @@ class AndroidAnalytics private constructor(
         controller?.startSession(builder.getMaxSessionPoolCount()?:defaultPoolCounter){isReadyToSync,sessions:List<Session>?->
             if(isReadyToSync){
                 sessions?.let {
+                coroutineScope.launch {
                     var result=builder.getNetworkSynchronizer()?.sendRequest(Request(sessions))
                     Executor.shutdown()
                     if(result?.isSuccessful == true){
                         controller?.removedSyncedData(result.sessionIds)
-                    }
+                        //coroutineScope?.cancel()
+                    }}
                 }
             }
 
@@ -101,7 +108,7 @@ class AndroidAnalytics private constructor(
      * Builder class for configuring and creating an instance of AndroidAnalytics.
      * @param context The application context used for initialization.
      */
-    class Builder(private val context: Context) {
+    class Builder( val context: Context) {
         private var storage: Storage? = null
         private var logLevel: LogLevel? = null
         private var poolCount: Int? = 10

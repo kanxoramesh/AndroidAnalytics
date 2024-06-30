@@ -13,7 +13,6 @@ import java.time.Instant
 
 /**
  * Implementation of SessionController interface for managing analytics sessions and events.
- * @param logger Logger instance for logging session and event actions.
  * @param storage Storage instance for saving and retrieving session and event data.
  */
 class SessionControllerImpl(private val storage: Storage) :
@@ -49,16 +48,21 @@ class SessionControllerImpl(private val storage: Storage) :
      * Starts a session with the specified pool count and returns the result via the callback.
      *
      * @param poolCount The desired pool count for sessions.
-     * @param param Callback function that receives a boolean indicating readiness and an optional list of sessions.
+     * @param callback Callback function that receives a boolean indicating readiness and an optional list of sessions.
      */
-    override fun startSession(poolCount: Int, param: (Boolean, List<Session>?) -> Unit) {
+    override fun startSession(poolCount: Int, callback: (Boolean, List<Session>?) -> Unit) {
         startSessionIfNeeded()
-        val isReady = storage.getSessionPoolCount()>poolCount
-        var list: List<Session>? = null
-        if (isReady) {
-            list = getSessions(poolCount)
+        val isReady = isSessionReady(poolCount)
+        val list: List<Session>? = if (isReady) {
+            getSessions(poolCount)
+        } else {
+            null
         }
-        param(isReady, list)
+        callback(isReady, list)
+    }
+
+    private fun isSessionReady(poolCount: Int): Boolean {
+        return storage.getSessionPoolCount() > poolCount
     }
 
     override fun pause() {
