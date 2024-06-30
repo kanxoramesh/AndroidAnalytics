@@ -13,6 +13,44 @@ Analytics SDK for Android.
   ```sh
       <uses-permission android:name="android.permission.INTERNET" />
   ```
+  
+#### SDK Configure with Remote URL
+Analytics SDK is hosted on Bitbucket. You can find more about Android SDK Gradle Artifact deployments in my previous post https://kanxoramesh.medium.com/bitbucket-as-maven-repository-888c7f72cfb7 
+* Provide Repo accesstoken in local.properties file
+  ```
+  bitbucket.token=*******token here*****
+
+  ```
+* On Project level setting.gradle.kts
+  ```
+   repositories {
+        
+        maven {
+            url = uri("url")
+
+            authentication {
+                create<HttpHeaderAuthentication>("header")
+            }
+            credentials(HttpHeaderCredentials::class) {
+                name = "Authorization"
+                value = "Bearer ${localProperties.getProperty("bitbucket.token")}"
+            }
+        }
+    }
+    
+  ```
+* On App level
+  ```
+    implementation 'com.analytics.analytics_android:analytics:1.0.1'//
+
+  ```
+  
+-------------OR----------------------
+#### SDK Configure with Local Path
+  ```
+implementation(project(":analytics-android"))
+    
+  ```
   ### Installation
 1. Initialize the SDK on Application Class
     ```sh
