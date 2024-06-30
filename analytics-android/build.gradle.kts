@@ -70,10 +70,10 @@ publishing {
     }
 
     publications {
-        create<MavenPublication>("mavenJava") {
+        create<MavenPublication>("maven") {
             pom {
                 groupId = "com.analytics.analytics_android" //your library package name e.g. com.remote.control
-                version = "1.0.0" //library version 1.0.0
+                version = "1.0.1" //library version 1.0.0
                 artifactId = "analytics" //your library artifact id. eg. dispatcher
                 artifact(file("$buildDir/outputs/aar/${project.getName()}-release.aar")) // Replace "aar location" with the actual location of your AAR file
                 name = "Android Analytics"
@@ -94,18 +94,12 @@ publishing {
                 }
                 withXml {
                     val dependenciesNode = asNode().appendNode("dependencies")
-                    val configurationNames = arrayOf("implementation", "api")
-
-                    configurationNames.forEach { configurationName ->
-                        configurations[configurationName].allDependencies.forEach {
-                            if (it.group != null) {
-                                val dependencyNode = dependenciesNode.appendNode("dependency")
-                                dependencyNode.appendNode("groupId", it.group)
-                                dependencyNode.appendNode("artifactId", it.name)
-                                dependencyNode.appendNode("version", it.version)
-                            }
+                        configurations["implementation"].allDependencies.forEach {
+                            val dependencyNode = dependenciesNode.appendNode("dependency")
+                            dependencyNode.appendNode("groupId", it.group)
+                            dependencyNode.appendNode("artifactId", it.name)
+                            dependencyNode.appendNode("version", it.version)
                         }
-                    }
                 }
             }
         }
