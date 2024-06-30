@@ -1,7 +1,10 @@
+import com.android.build.gradle.internal.scope.publishBuildArtifacts
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     kotlin("kapt")
+    id ("maven-publish")
 
 }
 
@@ -32,6 +35,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
 }
 
 dependencies {
@@ -55,4 +59,45 @@ dependencies {
     implementation (libs.okhttp)
     testImplementation ("org.mockito.kotlin:mockito-kotlin:4.0.0")
 
+}
+
+artifacts {
+    archives(file("aar location"))// eg. "$buildDir/outputs/aar/${project.getName()}-release.aar"
+}
+publishing {
+
+    repositories {
+        maven {
+            name = "myrepo"
+            url = uri("D:\\analytics\\android-analytics")//location where build generated
+        }
+    }
+
+    publications {
+        create<MavenPublication>("mavenJava") {
+            pom {
+                groupId = "com.analytics.analytics_android" //your library package name e.g. com.remote.control
+                version = "1.0.0" //library version 1.0.0
+                artifactId = "analytics" //your library artifact id. eg. dispatcher
+                artifact(file("$buildDir/outputs/aar/${project.getName()}-release.aar")) // Replace "aar location" with the actual location of your AAR file
+                name = "Android Analytics"
+                description = "Analytics for Android"
+                url = "Bitbucket.org"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "kanxoramesh"
+                        name = "Ramesh Pokhrel"
+                        email = "pokhrelramesh1996@gmail.com"
+                    }
+                }
+
+            }
+        }
+    }
 }
