@@ -14,11 +14,11 @@ class MyApplication : Application() {
             AndroidAnalytics.Builder(this)
                 .setStorage(RoomAnalyticsStorage(this))
                 .setLogLevel(LogLevel.INFO)
-                .maxSessionPoolCount(2))
-//                .setNetworkSynchronizer(AndroidAnalytics.OkHttpNetworkConnectionBuilder("http://10.0.2.2:8080/network")
-//                    .method(HttpMethod.POST)
-//                    .timeout(5)
-//                    //.client(OkHttpClient())//Optional
-//                    .build()))
+                .maxSessionPoolCount(2)
+                .setNetworkSynchronizer(AndroidAnalytics.OkHttpNetworkConnectionBuilder("http://10.0.2.2:8080/network")
+                    .method(HttpMethod.POST)
+                    .timeout(5)
+                    //.client(OkHttpClient())//Optional
+                    .build()))
     }
 }

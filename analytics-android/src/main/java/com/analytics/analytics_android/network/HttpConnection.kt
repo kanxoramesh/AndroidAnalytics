@@ -58,8 +58,8 @@ class HttpConnection(builder: AndroidAnalytics.OkHttpNetworkConnectionBuilder) :
         // Configure with external OkHttpClient
         client = if (builder.client == null) {
             OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(5, TimeUnit.SECONDS)
                 .build()
         } else {
             builder.client
