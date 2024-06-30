@@ -61,15 +61,11 @@ dependencies {
 
 }
 
-artifacts {
-    archives(file("aar location"))// eg. "$buildDir/outputs/aar/${project.getName()}-release.aar"
-}
 publishing {
-
     repositories {
         maven {
             name = "myrepo"
-            url = uri("D:\\analytics\\android-analytics")//location where build generated
+            url = uri("file://${project.projectDir.parent}/analytics-library/") // Adjusted to point to the desired directory
         }
     }
 
