@@ -16,6 +16,7 @@ appcompat = "1.7.0"
 material = "1.10.0"
 mockitoCore = "3.11.2"
 mockitoInline = "3.11.2"
+mockitoKotlin = "4.0.0"
 okhttp = "4.10.0"
 roomCommon = "2.6.1"
 roomCompiler = "2.6.1"
@@ -52,6 +53,7 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
 mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore" }
 mockito-inline = { module = "org.mockito:mockito-inline", version.ref = "mockitoInline" }
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 
 [plugins]

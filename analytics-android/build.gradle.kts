@@ -57,7 +57,7 @@ dependencies {
     testImplementation (libs.mockito.core)
     testImplementation (libs.mockito.inline)// Optional: For inline mocking
     implementation (libs.okhttp)
-    testImplementation ("org.mockito.kotlin:mockito-kotlin:4.0.0")
+    testImplementation (libs.mockito.kotlin)
 
 }
 
