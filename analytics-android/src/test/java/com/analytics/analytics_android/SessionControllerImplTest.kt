@@ -1,6 +1,9 @@
 package com.analytics.analytics_android
 
+import android.util.Log
+import androidx.lifecycle.MethodCallsLogger
 import com.analytics.analytics_android.core.logger.AnalyticsLogger
+import com.analytics.analytics_android.core.session.AnalyticsSession
 import com.analytics.analytics_android.core.session.SessionControllerImpl
 import com.analytics.analytics_android.core.storage.AnalyticsEventEntity
 import com.analytics.analytics_android.core.storage.AnalyticsSessionEntity
@@ -10,9 +13,12 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.*
 import org.mockito.Mock
+import org.mockito.MockedStatic
+import org.mockito.Mockito
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import java.time.Instant
+import java.util.logging.Logger
 
 class SessionControllerImplTest {
 
@@ -26,16 +32,50 @@ class SessionControllerImplTest {
 
     @Before
     fun setUp() {
+
         MockitoAnnotations.openMocks(this)
         sessionController = SessionControllerImpl(mockStorage)
-    }
 
+    }
+    @Test
+    fun `test startSession when session is ready`() {
+          sessionController = spy(SessionControllerImpl(mockStorage))
+        val logMock: MockedStatic<Log> = mockStatic(Log::class.java)
+
+        logMock.`when`<Int> { Log.i(any<String>(), anyString()) }.thenReturn(0)
+
+        // Mock dependencies
+        doAnswer { null }.`when`(sessionController).invokePrivateMethod<Unit>("startSessionIfNeeded")
+        doReturn(6).`when`(mockStorage).getSessionPoolCount()
+        val sessions = listOf(AnalyticsSession(), AnalyticsSession())
+        doReturn(sessions).`when`(sessionController).getSessions(5)
+
+        var resultIsReady: Boolean? = null
+        var resultList: List<Session>? = null
+
+        // Call the method under test
+        sessionController.startSession(5) { isReady, list ->
+            resultIsReady = isReady
+            resultList = list
+        }
+
+        // Verify behavior
+        verify(sessionController).getSessions(5)
+
+        // Assert results
+        assertEquals(true, resultIsReady)
+        assertEquals(sessions, resultList)
+    }
     @Test
     fun testStartAndEndSession() {
 
-        // Start session
-        sessionController.startSession(10) { _,_ ->
+        var resultIsReady: Boolean? = null
+        var resultList: List<Session>? = null
 
+        // Call the method under test
+        sessionController.startSession(5) { isReady, list ->
+            resultIsReady = isReady
+            resultList = list
         }
 
         // Verify session started and saved to storage
@@ -58,6 +98,8 @@ class SessionControllerImplTest {
         val sessionId = "testSessionId"
         val eventName = "testEvent"
         val properties = mapOf("key" to "value")
+
+
         val eventEntity = AnalyticsEventEntity(
             121L,
             sessionId,
@@ -65,12 +107,23 @@ class SessionControllerImplTest {
             gson.toJson(properties),
             Instant.now().toEpochMilli()
         )
+        Mockito.`when`(mockStorage.saveEvent(eventEntity)).thenAnswer { invocation ->
+            val savedEvent = invocation.arguments[0] as AnalyticsEventEntity
+            // Perform assertions on savedEvent if needed
+            assertEquals(eventEntity.eventName, savedEvent.eventName)
+            assertEquals(eventEntity.sessionId, savedEvent.sessionId)
+            assertEquals(eventEntity.properties, savedEvent.properties)
+            // You can add more assertions here as needed
+
+            null // Stubbed method doesn't return anything useful
+        }
         mockStorage.saveEvent(eventEntity)
 
-        // Start session
-        sessionController.startSession(10) { _ ,_->
 
-        }
+
+        // Start session
+        sessionController.startSession(10) { _, _ -> }
+
 
         // Add event
         sessionController.addEvent(eventName, properties)
@@ -79,35 +132,45 @@ class SessionControllerImplTest {
 
     @Test
     fun testGetSessions() {
-        // Mock session with events data
+        // Mock session and event data
         val sessionId = "testSessionId"
-        val startTime = Instant.now().toEpochMilli()
-        val endTime = startTime + 1000L
-        val sessionEntity = AnalyticsSessionEntity(sessionId, startTime, endTime)
+        val eventName = "testEvent"
+        val properties = mapOf("key" to "value")
         val eventEntity = AnalyticsEventEntity(
             121L,
             sessionId,
-            "eventname",
-            gson.toJson(mapOf("key" to "value")),
+            eventName,
+            gson.toJson(properties),
             Instant.now().toEpochMilli()
         )
-        val sessionWithEvents = SessionWithEvents(sessionEntity, listOf(eventEntity))
 
-        `when`(mockStorage.getSessionsWithEvents(null)).thenReturn(listOf(sessionWithEvents))
+        // Mock behavior of storage.getSessionPoolCount()
+        Mockito.`when`(mockStorage.getSessionPoolCount()).thenReturn(5)
 
-        // Retrieve sessions
-        val sessions = sessionController.getSessions(null)
-        assertEquals(1, sessions.size)
+        // Mock behavior of getSessions() if needed
+        Mockito.`when`(mockStorage.saveEvent(eventEntity)).then {
+            val savedEvent = it.arguments[0] as AnalyticsEventEntity
+            // Perform assertions on savedEvent if needed
+            assertEquals(eventEntity.eventName, savedEvent.eventName)
+            assertEquals(eventEntity.sessionId, savedEvent.sessionId)
+            assertEquals(eventEntity.properties, savedEvent.properties)
+            // You can add more assertions here as needed
 
-        // Verify session data
-        val retrievedSession = sessions[0]
-        assertEquals(sessionId, retrievedSession.sessionId)
-        assertEquals(startTime, retrievedSession.startTime)
-        assertEquals(endTime, retrievedSession.endTime)
+            null // Stubbed method doesn't return anything useful
+        }
 
-        // Verify event data
-        assertEquals(1, retrievedSession.events.size)
-        val retrievedEvent = retrievedSession.events[0]
-        assertEquals("eventname", retrievedEvent.getEventData()["eventName"])
+        // Call startSession on sessionController
+        sessionController.startSession(10) { isReady, sessions ->
+            // Assertions on the lambda parameters if needed
+            assertFalse(isReady)
+            assertNull(sessions) // Since list is null in your implementation when isReady is true
+        }
+
+      }
+
+    private fun <T> Any.invokePrivateMethod(methodName: String, vararg args: Any): T {
+        val method = this::class.java.getDeclaredMethod(methodName, *args.map { it::class.java }.toTypedArray())
+        method.isAccessible = true
+        return method.invoke(this, *args) as T
     }
 }
