@@ -41,7 +41,7 @@ Analytics SDK is hosted on Bitbucket. You can find more about Android SDK Gradle
   ```
 * On App level
   ```
-    implementation 'com.analytics.analytics_android:analytics:1.0.1'//
+    implementation 'com.analytics.analytics_android:analytics:1.0.2'//
 
   ```
   
