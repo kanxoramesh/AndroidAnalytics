@@ -92,7 +92,21 @@ publishing {
                         email = "pokhrelramesh1996@gmail.com"
                     }
                 }
+                withXml {
+                    val dependenciesNode = asNode().appendNode("dependencies")
+                    val configurationNames = arrayOf("implementation", "api")
 
+                    configurationNames.forEach { configurationName ->
+                        configurations[configurationName].allDependencies.forEach {
+                            if (it.group != null) {
+                                val dependencyNode = dependenciesNode.appendNode("dependency")
+                                dependencyNode.appendNode("groupId", it.group)
+                                dependencyNode.appendNode("artifactId", it.name)
+                                dependencyNode.appendNode("version", it.version)
+                            }
+                        }
+                    }
+                }
             }
         }
     }

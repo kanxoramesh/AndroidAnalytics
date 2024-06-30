@@ -24,6 +24,10 @@ dependencyResolutionManagement {
         mavenCentral()
         maven {
             url = uri("https://api.bitbucket.org/2.0/repositories/kanxoramesh/android-analytics/src/master")
+
+            authentication {
+                create<HttpHeaderAuthentication>("header")
+            }
             credentials(HttpHeaderCredentials::class) {
                 name = "Authorization"
                 value = "Bearer ${localProperties.getProperty("bitbucket.token")}"
@@ -34,4 +38,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Analytics"
 include(":app")
-//include(":analytics-android")
+include(":analytics-android")
